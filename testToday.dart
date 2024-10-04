@@ -9,6 +9,7 @@ class TheTest extends StatefulWidget {
 
 class _TheTestState extends State<TheTest> {
   List members = [];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void addMember() {
     String name = '';
@@ -19,23 +20,38 @@ class _TheTestState extends State<TheTest> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Add Member'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(hintText: 'Name'),
-                onChanged: (value) {
-                  name = value;
-                },
-              ),
-              TextField(
-                decoration: InputDecoration(hintText: 'Age'),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  age = value;
-                },
-              ),
-            ],
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'Name'),
+                  onChanged: (value) {
+                    name = value;
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter a name';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'Age'),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    age = value;
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter the age';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -46,12 +62,12 @@ class _TheTestState extends State<TheTest> {
             ),
             TextButton(
               onPressed: () {
-                if (name.isNotEmpty && age.isNotEmpty) {
+                if (_formKey.currentState!.validate()) {
                   setState(() {
                     members.add({'name': name, 'age': age});
                   });
+                  Navigator.of(context).pop();
                 }
-                Navigator.of(context).pop();
               },
               child: Text('OK'),
             ),
